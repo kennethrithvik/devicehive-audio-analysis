@@ -16,13 +16,13 @@ import csv
 import os
 import numpy as np
 import tensorflow as tf
+from sklearn.externals import joblib
+from keras.models import load_model
 
 from . import params
 from .utils import vggish, youtube8m
 
-
 __all__ = ['WavProcessor', 'format_predictions']
-
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
@@ -44,6 +44,7 @@ class WavProcessor(object):
         self._init_vggish()
         self._init_youtube()
         self._init_class_map()
+        self.fall_model = load_model(params.FALL_MODEL)
 
     def __enter__(self):
         return self
@@ -88,6 +89,12 @@ class WavProcessor(object):
         features = self._get_features(examples_batch)
         predictions = self._process_features(features)
         predictions = self._filter_predictions(predictions)
+
+        fall_predictions = self.fall_model.predict(features)
+        if self._filter_fall_predictions(fall_predictions):
+            fall_predictions = self._filter_fall_predictions(fall_predictions)
+            predictions.insert(0,fall_predictions)
+
         return predictions
 
     def _filter_predictions(self, predictions):
@@ -98,6 +105,15 @@ class WavProcessor(object):
         line = ((self._class_map[i], float(predictions[0][i])) for
                 i in top_indices if predictions[0][i] > hit)
         return sorted(line, key=lambda p: -p[1])
+
+    def _filter_fall_predictions(self, predictions):
+        surity = 0
+        for i in predictions:
+            if i[1] > 0.3:
+                surity += 1
+        if (surity / predictions.shape[0]) > 0.3:
+            return ("Human_fall", surity / predictions.shape[0])
+        return False
 
     def _process_features(self, features):
         sess = self._youtube_sess

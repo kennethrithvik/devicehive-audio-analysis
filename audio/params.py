@@ -55,3 +55,7 @@ CLASS_LABELS_INDICES = 'models/class_labels_indices.csv'
 # Predictions filter
 PREDICTIONS_COUNT_LIMIT = 20
 PREDICTIONS_HIT_LIMIT = 0.1
+
+#fall model
+FALL_MODEL= 'models/fall_model.h5'
+
