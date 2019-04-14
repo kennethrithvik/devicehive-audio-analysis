@@ -6,3 +6,5 @@ tensorflow==1.3.0
 six==1.11.0
 devicehive==2.1.1
 -e git://github.com/devicehive/devicehive-python-webconfig.git#egg=devicehive_webconfig
+
+
