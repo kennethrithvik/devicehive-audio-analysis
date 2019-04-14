@@ -1,0 +1,7 @@
+{
+    "url": "",
+    "a_token": "",
+    "r_tokendevice_id": "",
+    "r_token": "${r_token}",
+    "device_id": "${device_id}"
+}
